@@ -58,11 +58,11 @@ The goal of this project is to **explore how reinforcement learning works in pra
 
 We approximate the Q-function with a neural network:
 
-$$Q(s,a; \theta) \approx Q^*(s,a)$$
+$$Q(s,a) \approx Q_\theta(s,a)$$
 
 Training minimizes the Bellman error:
 
-$$L = \mathbb{E}[(Q(s,a) - (r + \gamma \max_{a'} Q(s',a')))^2]$$
+$$L = \mathbb{E}[(Q(s,a) - (r + \gamma \max_{a'} Q(s',a)))^2]$$
 
 ### Key Components Implemented
 
