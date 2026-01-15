@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CartPole DQN Demo</title>
+  <style>
+    body {
+      font-family: Arial;
+      margin: 30px;
+      background: #f9f9f9;
+    }
+
+    canvas {
+      border: 1px solid #333;
+      background: white;
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 10px 16px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #stats {
+      margin-top: 10px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>CartPole — DQN Evaluation</h1>
+<button onclick="run()">Run Episode</button>
+
+<div id="stats"></div>
+
+<canvas id="canvas" width="600" height="300"></canvas>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+const trackY = 200;
+const scale = 100;  // pixels per unit
+
+function draw(state) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const cartX = canvas.width / 2 + state.cart_position * scale;
+  const poleAngle = state.pole_angle;
+
+  // Track
+  ctx.beginPath();
+  ctx.moveTo(0, trackY);
+  ctx.lineTo(canvas.width, trackY);
+  ctx.stroke();
+
+  // Cart
+  ctx.fillStyle = "black";
+  ctx.fillRect(cartX - 20, trackY - 10, 40, 20);
+
+  // Pole
+  const poleLength = 80;
+  const poleX = cartX;
+  const poleY = trackY - 10;
+
+  const poleEndX = poleX + poleLength * Math.sin(poleAngle);
+  const poleEndY = poleY - poleLength * Math.cos(poleAngle);
+
+  ctx.beginPath();
+  ctx.moveTo(poleX, poleY);
+  ctx.lineTo(poleEndX, poleEndY);
+  ctx.strokeStyle = "red";
+  ctx.lineWidth = 4;
+  ctx.stroke();
+}
+
+async function run() {
+  document.getElementById("stats").textContent = "Running...";
+  const res = await fetch("/run_episode", { method: "POST" });
+  const data = await res.json();
+
+  document.getElementById("stats").textContent =
+    `Total Reward: ${data.total_reward} | Steps: ${data.steps}`;
+
+  for (let step of data.trajectory) {
+    draw(step);
+    await new Promise(r => setTimeout(r, 20));
+  }
+}
+</script>
+
+</body>
+</html>
